@@ -185,13 +185,12 @@ input[type=text]:focus, textarea:focus, select:focus {
   padding: 16px; 
   font-size: 14px; 
   line-height: 1.7; 
-  color: var(--color-text-primary); 
   white-space: pre-wrap; 
   min-height: 50px; 
 }
-.mm-output.blue { background: #E6F1FB; border-left: 3px solid #378ADD; }
-.mm-output.teal { background: #E1F5EE; border-left: 3px solid #1D9E75; }
-.mm-output.amber { background: #FAEEDA; border-left: 3px solid #EF9F27; }
+.mm-output.blue { background: #E6F1FB; border-left: 3px solid #378ADD; color: #0C447C; }
+.mm-output.teal { background: #E1F5EE; border-left: 3px solid #1D9E75; color: #085041; }
+.mm-output.amber { background: #FAEEDA; border-left: 3px solid #EF9F27; color: #633806; }
 
 .mm-copy-btn { 
   font-size: 12px; 
