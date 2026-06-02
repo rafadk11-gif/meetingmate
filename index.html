@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeetingMate — AI-Powered Meeting Facilitation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="mm-wrap">
+      <div class="mm-header">
+        <div class="mm-header-icon"><i class="ti ti-calendar-event"></i></div>
+        <div>
+          <div class="mm-header-title">MeetingMate</div>
+          <div class="mm-header-sub">From scattered notes to clear commitments</div>
+        </div>
+        <div class="mm-header-clock">
+          <div class="t" id="mm-clock">--:--</div>
+          <div class="d" id="mm-day">Team 2</div>
+        </div>
+      </div>
+
+      <div class="mm-tabs">
+        <button class="mm-tab active" data-c="blue" onclick="switchTab('agenda', this)"><i class="ti ti-list-check"></i> Agenda</button>
+        <button class="mm-tab" data-c="teal" onclick="switchTab('summary', this)"><i class="ti ti-file-text"></i> Summary</button>
+        <button class="mm-tab" data-c="amber" onclick="switchTab('openitems', this)"><i class="ti ti-flag"></i> Open items <span class="mm-badge" id="oi-count">0</span></button>
+      </div>
+
+      <div class="mm-panel active" id="panel-agenda">
+        <div class="mm-card accent-blue">
+          <p class="mm-section-intro">Enter your meeting context and attendees. MeetingMate builds a structured agenda with time allocations and discussion points.</p>
+          <div class="mm-row">
+            <div>
+              <div class="mm-label">Project name</div>
+              <input type="text" id="proj-name" placeholder="e.g. Client Onboarding Sprint 4" />
+            </div>
+            <div>
+              <div class="mm-label">Meeting type</div>
+              <select id="meeting-type">
+                <option>Weekly standup</option>
+                <option>Sprint review</option>
+                <option>Client status update</option>
+                <option>Kickoff meeting</option>
+                <option>Risk review</option>
+                <option>Retrospective</option>
+              </select>
+            </div>
+          </div>
+          <div class="mm-row" style="margin-top:14px;">
+            <div>
+              <div class="mm-label">Duration (minutes)</div>
+              <input type="text" id="duration" placeholder="60" />
+            </div>
+            <div>
+              <div class="mm-label">Meeting date</div>
+              <input type="text" id="meeting-date" placeholder="e.g. June 10, 2026" />
+            </div>
+          </div>
+          <div class="mm-label" style="margin-top:16px;">Key topics to cover</div>
+          <textarea id="topics" rows="3" placeholder="e.g. Review last sprint deliverables, discuss blockers, align on Q3 scope"></textarea>
+          <div class="mm-label" style="margin-top:14px;">Attendees</div>
+          <div id="attendee-list">
+            <div class="mm-attendee-row"><i class="ti ti-user-circle pin"></i><input type="text" placeholder="Name and role (e.g. Chinmay — PM Lead)" /></div>
+            <div class="mm-attendee-row"><i class="ti ti-user-circle pin"></i><input type="text" placeholder="Name and role" /></div>
+          </div>
+          <button class="mm-add-btn" onclick="addAttendee()"><i class="ti ti-plus"></i> Add attendee</button>
+          <div class="mm-label" style="margin-top:16px;">Open items to carry in (optional)</div>
+          <textarea id="open-in" rows="2" placeholder="e.g. Decision on vendor still pending, Rafael to confirm API access"></textarea>
+          <button class="mm-gen-btn blue" id="agenda-btn" onclick="generateAgenda()"><i class="ti ti-sparkles"></i> Generate agenda</button>
+          <div id="agenda-err" class="mm-err"></div>
+        </div>
+        <div id="agenda-result" style="display:none;">
+          <div class="mm-output-label">Generated agenda <button class="mm-copy-btn" onclick="copyText('agenda-output')"><i class="ti ti-copy"></i> Copy</button></div>
+          <div class="mm-output blue" id="agenda-output"></div>
+        </div>
+      </div>
+
+      <div class="mm-panel" id="panel-summary">
+        <div class="mm-card accent-teal">
+          <p class="mm-section-intro">Paste your transcript or notes. MeetingMate extracts decisions, action items with owners and deadlines, and flags what is still unresolved.</p>
+          <div class="mm-label">Meeting name / context (optional)</div>
+          <input type="text" id="sum-context" placeholder="e.g. Sprint 4 Review — Client Onboarding" />
+          <div class="mm-label" style="margin-top:14px;">Transcript or meeting notes</div>
+          <textarea id="transcript" rows="8" placeholder="Paste your transcript here. Can be a rough Zoom transcript, bullet notes, or anything in between..."></textarea>
+          <button class="mm-gen-btn teal" id="summary-btn" onclick="generateSummary()"><i class="ti ti-sparkles"></i> Generate summary</button>
+          <div id="summary-err" class="mm-err"></div>
+        </div>
+        <div id="summary-result" style="display:none;">
+          <div class="mm-output-label"><span><i class="ti ti-gavel" style="font-size:14px; vertical-align:-2px; margin-right:5px;"></i>Decisions made</span> <button class="mm-copy-btn" onclick="copyText('decisions-output')"><i class="ti ti-copy"></i> Copy</button></div>
+          <div class="mm-output teal" id="decisions-output"></div>
+          <div class="mm-output-label" style="margin-top:14px;"><i class="ti ti-checklist" style="font-size:14px; vertical-align:-2px; margin-right:5px;"></i>Action items</div>
+          <div class="mm-output blue" id="actions-output"></div>
+          <div style="margin-top:14px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <button class="mm-gen-btn" style="width:auto; padding:9px 16px; margin-top:0; background:#BA7517;" onclick="addToOpenItems()"><i class="ti ti-flag"></i> Send unresolved to open items</button>
+            <span class="mm-sent-msg" id="oi-sent-msg"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mm-panel" id="panel-openitems">
+        <div class="mm-card accent-amber">
+          <p class="mm-section-intro">Unresolved items carry forward automatically between meetings, so nothing slips between sprints. Resolve them here or pull them into the next agenda.</p>
+          <div id="open-items-list"></div>
+          <div style="margin-top:14px;">
+            <div class="mm-label">Add item manually</div>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="manual-item" placeholder="Describe the open item..." style="flex:1;" />
+              <input type="text" id="manual-owner" placeholder="Owner" style="width:110px;" />
+              <button class="mm-add-btn" style="margin-top:0; white-space:nowrap;" onclick="addManualItem()"><i class="ti ti-plus"></i> Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
