@@ -15,9 +15,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Use v1 endpoint for AI Studio keys
+    // Use v1 endpoint with gemini-pro model for AI Studio keys
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
